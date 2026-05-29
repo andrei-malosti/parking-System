@@ -1,9 +1,6 @@
 package com.parking.api.view;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -49,8 +46,12 @@ public class MainView extends JFrame {
 	}
 
 	private JPanel createMainMenu() {
-		JPanel painel = new JPanel(new GridLayout(3, 1, 10, 10));
-		painel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+		JPanel container = new JPanel(new GridBagLayout());
+
+		JPanel painelBotoes = new JPanel(new GridLayout(3, 1, 0, 15));
+		painelBotoes.setOpaque(false);
+
+		painelBotoes.setPreferredSize(new Dimension(450, 380));
 
 		JButton btnInsert = new JButton("Insert Bays");
 		JButton btnCheckIn = new JButton("Check-in");
@@ -81,11 +82,18 @@ public class MainView extends JFrame {
 			cardLayout.show(cards, "CheckOut");
 		});
 
-		painel.add(btnInsert);
-		painel.add(btnCheckIn);
-		painel.add(btnCheckOut);
+		painelBotoes.add(btnInsert);
+		painelBotoes.add(btnCheckIn);
+		painelBotoes.add(btnCheckOut);
 
-		return painel;
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+
+		container.add(painelBotoes, gbc);
+
+		return container;
 	}
 
 	private JPanel checkIn() {
@@ -94,10 +102,22 @@ public class MainView extends JFrame {
 		JButton btnBack = new JButton("<- Back to menu");
 		btnBack.addActionListener(e -> cardLayout.show(cards, "Menu"));
 
-		gridBaysAvailable = new JPanel(new GridLayout(0, 5, 10, 10));
+		gridBaysAvailable = new JPanel();
+		gridBaysAvailable.setLayout(new GridLayout(0, 5, 10, 10));
+		gridBaysAvailable.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		gridBaysAvailable.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+		JPanel wrapper = new JPanel(new BorderLayout());
+		wrapper.add(gridBaysAvailable, BorderLayout.NORTH);
+
+		JScrollPane scroll = new JScrollPane(wrapper);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		scroll.getVerticalScrollBar().setUnitIncrement(16);
 
 		container.add(btnBack, BorderLayout.NORTH);
-		container.add(new JScrollPane(gridBaysAvailable), BorderLayout.CENTER);
+		container.add(scroll, BorderLayout.CENTER);
 
 		return container;
 	}
@@ -108,10 +128,20 @@ public class MainView extends JFrame {
 		JButton btnBack = new JButton("<- Back to menu");
 		btnBack.addActionListener(e -> cardLayout.show(cards, "Menu"));
 
-		gridBaysOccupied = new JPanel(new GridLayout(0, 5, 10, 10));
+		gridBaysOccupied = new JPanel();
+		gridBaysOccupied.setLayout(new GridLayout(0, 5, 10, 10));
+		gridBaysOccupied.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+		JPanel wrapper = new JPanel(new BorderLayout());
+		wrapper.add(gridBaysOccupied, BorderLayout.NORTH);
+
+		JScrollPane scroll = new JScrollPane(wrapper);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scroll.getVerticalScrollBar().setUnitIncrement(16);
 
 		container.add(btnBack, BorderLayout.NORTH);
-		container.add(new JScrollPane(gridBaysOccupied), BorderLayout.CENTER);
+		container.add(scroll, BorderLayout.CENTER);
 
 		return container;
 	}
@@ -124,6 +154,8 @@ public class MainView extends JFrame {
 		for (BayResponseDTO dto : baysAvailable) {
 			JButton btnBay = new JButton("Bay: " + dto.getId());
 			btnBay.setBackground(Color.GREEN);
+			btnBay.setPreferredSize(new Dimension(100, 60));
+
 			btnBay.addActionListener(e -> {
 				try {
 					bayService.checkIn(dto.getId());
@@ -148,6 +180,8 @@ public class MainView extends JFrame {
 		for (BayResponseDTO dto : baysOccupied) {
 			JButton btnBay = new JButton("Bay: " + dto.getId());
 			btnBay.setBackground(Color.RED);
+			btnBay.setPreferredSize(new Dimension(100, 60));
+
 			btnBay.addActionListener(e -> {
 				try {
 					bayService.checkOut(dto.getId());
